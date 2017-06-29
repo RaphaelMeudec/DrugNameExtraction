@@ -1,15 +1,30 @@
-import numpy as np
-import pandas as pd
+"""Script for launching drug names extraction of a file."""
 import nltk
 import metaphone
 
+
 def text_file_to_tokens(filepath):
+    """
+    Transform file into tokens.
+
+    :param filepath: str | Path to file
+    :return: list | Tokenized words
+    """
     f = open(filepath, 'r')
     txt = f.read()
     f.close()
     return nltk.word_tokenize(txt)
 
+
 def remove_stopwords(tokens, ponct=True, language="english"):
+    """
+    Remove stopwords from a list of words.
+
+    :param tokens: list | List of words to examine
+    :param ponct: bool | Remove ponctuation ?
+    :param language: str | language of the words
+    :return: list | List of words filtered
+    """
     stop = set(nltk.corpus.stopwords.words(language))
     if ponct:
         stop.update(['.', ',', '"', "'", '?', '!', ':', ';', '(', ')', '[', ']', '{', '}'])
@@ -19,7 +34,15 @@ def remove_stopwords(tokens, ponct=True, language="english"):
             l.append(token)
     return l
 
+
 def extract_drug_names(l, names):
+    """
+    Extract drug names from a list of words.
+
+    :param l: list | List of words
+    :param names: list | List of possible drug names
+    :return: list | List of drug names in the list
+    """
     names_low = [name.lower().strip() for name in names]
     names_meta = [metaphone.doublemetaphone(name) for name in names]
     result = []
@@ -32,7 +55,8 @@ def extract_drug_names(l, names):
 
     return result
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     input_file = "file_modified.txt"
     tokens = text_file_to_tokens(input_file)
     clean_tokens = remove_stopwords(tokens)
