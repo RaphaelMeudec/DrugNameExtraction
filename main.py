@@ -1,6 +1,14 @@
 """Script for launching drug names extraction of a file."""
+import os
 import nltk
 import metaphone
+
+RXNORM_PATH = "rxnorm/"
+RXNCONSO_PATH = os.path.join(RXNORM_PATH, "rxnconso.csv")
+RXNREL_PATH = os.path.join(RXNORM_PATH, "rxnrel.csv")
+RXNSAB_PATH = os.path.join(RXNORM_PATH, "rxnsab.csv")
+RXNSAT_PATH = os.path.join(RXNORM_PATH, "rxnsat.csv")
+RXNSTY_PATH = os.path.join(RXNORM_PATH, "rxnsty.csv")
 
 
 def text_file_to_tokens(filepath):
