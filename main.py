@@ -1,14 +1,9 @@
 """Script for launching drug names extraction of a file."""
 import os
+import pandas as pd
 import nltk
 import metaphone
-
-RXNORM_PATH = "rxnorm/"
-RXNCONSO_PATH = os.path.join(RXNORM_PATH, "rxnconso.csv")
-RXNREL_PATH = os.path.join(RXNORM_PATH, "rxnrel.csv")
-RXNSAB_PATH = os.path.join(RXNORM_PATH, "rxnsab.csv")
-RXNSAT_PATH = os.path.join(RXNORM_PATH, "rxnsat.csv")
-RXNSTY_PATH = os.path.join(RXNORM_PATH, "rxnsty.csv")
+import click
 
 
 def text_file_to_tokens(filepath):
@@ -43,6 +38,18 @@ def remove_stopwords(tokens, ponct=True, language="english"):
     return l
 
 
+def generate_list_of_drugs(paths):
+    """
+    Generate list of drug names based on rxnorm database.
+
+    :param paths: dict | Dictionnary of path with table names as keys
+    :return: pd.DataFrame | Data
+    """
+    rxnconso_df = pd.read_csv(paths['rxnconso'])
+    rxnrel_df = pd.read_csv(paths['rxnrel'])
+    return rxnconso_df, rxnrel_df
+
+
 def extract_drug_names(l, names):
     """
     Extract drug names from a list of words.
@@ -64,12 +71,34 @@ def extract_drug_names(l, names):
     return result
 
 
-if __name__ == "__main__":
-    input_file = "file_modified.txt"
-    tokens = text_file_to_tokens(input_file)
+@click.command()
+@click.option('--filepath', help="Path to file")
+@click.option('--rxnormpath', help="Path to the rxnorm directory containing the .csv")
+def main(filepath, rxnormpath):
+    RXNORM_PATH = rxnormpath
+    RXNCONSO_PATH = os.path.join(RXNORM_PATH, "rxnconso.csv")
+    RXNREL_PATH = os.path.join(RXNORM_PATH, "rxnrel.csv")
+    RXNSAB_PATH = os.path.join(RXNORM_PATH, "rxnsab.csv")
+    RXNSAT_PATH = os.path.join(RXNORM_PATH, "rxnsat.csv")
+    RXNSTY_PATH = os.path.join(RXNORM_PATH, "rxnsty.csv")
+
+    tokens = text_file_to_tokens(filepath)
     clean_tokens = remove_stopwords(tokens)
-    # TODO: drugs = rxnormhandler.list_drug_names()
+
+    rxnorm_paths = {
+        'rxnconso': RXNCONSO_PATH,
+        'rxnrel': RXNREL_PATH,
+        'rxnsab': RXNSAB_PATH,
+        'rxnsat': RXNSAT_PATH,
+        'rxnsty': RXNSTY_PATH
+    }
+
     drugs = ['methadone', 'protonix', 'lovenox', 'azithromycin']
+    # drugs = generate_list_of_drugs(rxnorm_paths)
 
     drug_names = extract_drug_names(clean_tokens, drugs)
     print(drug_names)
+
+
+if __name__ == "__main__":
+    main()
