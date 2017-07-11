@@ -10,6 +10,13 @@ class TestDrugName(unittest.TestCase):
 
         self.assertEqual(de.levenshtein_distance("hello", "hello"), 0)
         self.assertEqual(de.levenshtein_distance("examen", "examan"), 1)
+        self.assertEqual(de.levenshtein_distance("hello", "hella"), 1)
+
+        self.assertEqual(de.levenshtein_criteria(0, "hello"), 1)
+        self.assertEqual(de.levenshtein_criteria(1, ""), 0)
+        self.assertEqual(de.levenshtein_criteria(0, ""), 0)
+        self.assertEqual(de.levenshtein_criteria(1, "hello world"), 1)
+        self.assertEqual(de.levenshtein_criteria(2, "development"), 1)
 
     def test(self):
         """Run all the tests of folder."""
