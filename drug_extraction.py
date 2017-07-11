@@ -18,13 +18,12 @@ def load_rxnorm(paths):
 
 
 def add_metaphone_to_rxnorm(df_rxnconso):
-    names = df_rxnconso['STR']
-    names_low = [name.lower().strip() for name in names]
-    names_meta = [metaphone.doublemetaphone(name) for name in names_low]
-    df_rxnconso['low'] = names_low
-    df_rxnconso['dmeta'] = names_meta
-    print(df_rxnconso.values.shape)
-    return df_rxnconso
+    df_names = df_rxnconso['STR']
+    names = df_names.unique()
+    # Removing all composed names as we split text on spaces
+    names_low = set([name.lower().strip() for name in names if ' ' not in name.lower().strip()])
+
+    return names_low
 
 
 def strict_equal_criteria(word1, word2):
@@ -45,8 +44,9 @@ def levenshtein_distance(word1, word2):
     return dist[size1-1, size2-1]
 
 
-def levenshtein_criteria(distance):
-    return distance < 4
+def levenshtein_criteria(distance, word):
+    length = len(word)
+    return distance/length < 0.2
 
 
 def metaphone_criteria(word1, word2):
@@ -55,14 +55,36 @@ def metaphone_criteria(word1, word2):
     metaphone_apply = word1_meta == word2_meta
     if metaphone_apply:
         levenshtein_dist = levenshtein_distance(word1, word2)
-        levenshtein_apply = levenshtein_criteria(levenshtein_dist)
+        levenshtein_apply = levenshtein_criteria(levenshtein_dist, word1)
     else:
         levenshtein_apply = False
 
     return levenshtein_apply
 
 
-def extract_drug_names(l, df_rxnconso):
+def are_words_close(word1, word2):
+    are_equal = strict_equal_criteria(word1, word2)
+    if are_equal:
+        return "true_eq"
+    else:
+        are_similar = metaphone_criteria(word1, word2)
+        if are_similar:
+            return "meta_eq"
+
+    return "no_eq"
+
+
+def is_word_in_list(word, drug_names):
+    word_low = word.lower().strip()
+    for el in drug_names:
+        relation = are_words_close(word_low, el)
+        if relation != "no_eq":
+            return relation
+
+    return "no_eq"
+
+
+def extract_drug_names(l, drug_names):
     """
     Extract drug names from a list of words.
 
@@ -72,13 +94,8 @@ def extract_drug_names(l, df_rxnconso):
     """
     extracted_names = []
     for x in tqdm.tqdm(l, desc="Tokens"):
-        x_low = x.lower().strip()
-        for el in df_rxnconso['low'].unique():
-            are_equal = strict_equal_criteria(x_low, el)
-            are_similar = metaphone_criteria(x_low, el)
-            if are_equal:
-                extracted_names.append((x_low, "true_eq"))
-            elif are_similar:
-                extracted_names.append((x_low, "meta_eq"))
+        relation = is_word_in_list(x, drug_names)
+        if relation != "no_eq":
+            extracted_names.append((x.lower().strip(), relation))
 
     return extracted_names
