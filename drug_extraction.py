@@ -17,7 +17,7 @@ def load_rxnorm(paths):
     return df_rxnconso
 
 
-def add_metaphone_to_rxnorm(df_rxnconso):
+def extract_drug_names_from_rxnorm(df_rxnconso):
     df_names = df_rxnconso['STR']
     names = df_names.unique()
     # Removing all composed names as we split text on spaces

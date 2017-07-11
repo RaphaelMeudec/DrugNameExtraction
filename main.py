@@ -31,7 +31,7 @@ def main(filepath, rxnormpath, verbose):
     df_rxnconso = de.load_rxnorm(rxnorm_paths)
     if verbose:
         print("Adding lower values and metaphone values")
-    drug_names_list = de.add_metaphone_to_rxnorm(df_rxnconso)
+    drug_names_list = de.extract_drug_names_from_rxnorm(df_rxnconso)
     if verbose:
         print("Extracting drug names from file.")
     drug_names = de.extract_drug_names(clean_tokens, drug_names_list)
