@@ -34,12 +34,12 @@ def strict_equal_criteria(word1, word2):
 def levenshtein_distance(word1, word2):
     size1, size2 = len(word1), len(word2)
     dist = np.zeros((size1, size2))
-    dist[:, 0] = np.range(size1)
-    dist[0, :] = np.range(size2)
+    dist[:, 0] = np.range(size1+1)
+    dist[0, :] = np.range(size2+1)
 
     for i in range(1, size1):
         for j in range(1, size2):
-            cout = 1 - word1[i] == word2[j]
+            cout = 1 - word1[i-1] == word2[j-1]
             dist[i, j] = min(dist[i-1, j] + 1, dist[i, j-1]+1, dist[i-1, j-1] + cout)
 
     return dist[size1-1, size2-1]
