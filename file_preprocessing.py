@@ -31,3 +31,14 @@ def remove_stopwords(tokens, ponct=True, language="english"):
         if token.lower().strip() not in stop:
             l.append(token)
     return l
+
+
+def parse_tuheeg_drug_names(filepath):
+    drugs = []
+    with open(filepath, 'r') as f:
+        for line in f:
+            if 'MEDICATIONS' in line:
+                el = line.replace(',', ':')
+                drugs = nltk.word_tokenize(el)
+
+    return drugs
