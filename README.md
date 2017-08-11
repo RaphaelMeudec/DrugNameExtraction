@@ -23,6 +23,13 @@ virtual venv -p python3
 pip install -r requirements.txt
 ```
 
+# RxNORM
+
+This project is based on the RxNORM database, by the U.S National Library of Medicine. Make sure you get the sql tables from their website, and export them as csv files in a `rxnorm` directory.
+
 # Use
 
-
+To run the analysis, just use:
+```python
+python main.py --dirpath=path/to/my/file.txt --rxnormpath=path/to/rxnorm
+```
